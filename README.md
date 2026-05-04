@@ -96,11 +96,16 @@ Add entries to the `hooks` array. Hooks run sequentially after every group switc
 
 ```jsonc
 "hooks": [
-  {
-    "type": "process",
-    "path": "powershell.exe",
-    "args": "-Command Restart-Service Tailscale"
-  }
+    {
+      "Type": "process",
+      "Path": "C:\\Program Files\\Tailscale\\tailscale.exe",
+      "Args": "down"
+    },
+    {
+      "Type": "process",
+      "Path": "C:\\Program Files\\Tailscale\\tailscale.exe",
+      "Args": "up"
+    }
 ]
 ```
 
