@@ -1,0 +1,33 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+packages/
+.nuget/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# App-specific: don't commit local config with personal adapter names/hooks
+# The template config.json in the project root IS committed (it's the default)
+LinkManager/bin/Debug/net8.0-windows/config.json
+LinkManager/bin/Release/net8.0-windows/config.json
+linkmanager.log

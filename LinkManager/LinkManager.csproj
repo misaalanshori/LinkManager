@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- WinExe hides the console window in production -->
+		<OutputType>WinExe</OutputType>
+
+		<!-- Windows-only app -->
+		<TargetFramework>net8.0-windows</TargetFramework>
+
+		<!-- Required for NotifyIcon (system tray) -->
+		<UseWindowsForms>true</UseWindowsForms>
+
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Embed the admin manifest so Windows UAC elevates on launch -->
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Copy config.json next to the exe so it's easy to find and edit -->
+		<Content Include="config.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>

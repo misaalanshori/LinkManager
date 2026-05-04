@@ -1,0 +1,34 @@
+{
+  "adapters": [
+    {
+      "identifier": "vEthernet (VMSwitch)",
+      "priority": 0
+    },
+    {
+      "identifier": "Wi-Fi",
+      "priority": 1
+    },
+    {
+      "identifier": "Remote NDIS Compatible Device",
+      "priority": 2
+    }
+  ],
+  "testEndpoints": [
+    "8.8.8.8",
+    "1.1.1.1",
+    "9.9.9.9"
+  ],
+  "httpTestEndpoints": [
+    "http://www.msftconnecttest.com/connecttest.txt",
+    "https://www.google.com/generate_204",
+    "https://cp.cloudflare.com"
+  ],
+  "pollIntervalMs": 5000,
+  "switchCooldownMs": 15000,
+  "failThreshold": 3,
+  "restoreThreshold": 5,
+  "probeTimeoutMs": 2000,
+  "hooks": [],
+  "enableNotifications": true,
+  "startWithWindows": true
+}
