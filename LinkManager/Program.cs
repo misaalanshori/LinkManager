@@ -26,11 +26,9 @@ static class Program
         var tray = new TrayIcon(engine, config);
 
         // 5. Hot-reload: watch config.json for external edits
-        ConfigLoader.Watch(newConfig =>
-        {
-            // Marshal to UI thread (Watch fires on FileSystemWatcher thread)
-            Application.OpenForms[0]?.BeginInvoke(() => engine.ReloadConfig(newConfig));
-        });
+        // engine.ReloadConfig() is thread-safe (cancels + restarts the background task),
+        // so no UI-thread marshaling is needed here.
+        ConfigLoader.Watch(newConfig => engine.ReloadConfig(newConfig));
 
         // 6. Auto-start: register Task Scheduler entry on first run if configured
         if (config.StartWithWindows && !AutoStartManager.IsRegistered())

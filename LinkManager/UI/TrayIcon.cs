@@ -15,6 +15,7 @@ public sealed class TrayIcon : IDisposable
     private readonly LinkEngine _engine;
     private readonly ToastNotifier _toastNotifier;
     private readonly ContextMenuStrip _menu;
+    private readonly SynchronizationContext _syncContext;
     private AppConfig _config;
 
     // Menu item references for toggling
@@ -30,6 +31,13 @@ public sealed class TrayIcon : IDisposable
     {
         _engine = engine;
         _config = config;
+
+        // Tray-only apps don't create a Form, so WinForms never auto-installs
+        // WindowsFormsSynchronizationContext. We install it explicitly here on
+        // the main thread so we can marshal engine events to the UI thread.
+        if (SynchronizationContext.Current == null)
+            SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+        _syncContext = SynchronizationContext.Current!;
 
         _notifyIcon = new NotifyIcon { Visible = true, Text = "LinkManager" };
         _menu = BuildContextMenu();
@@ -245,18 +253,11 @@ public sealed class TrayIcon : IDisposable
         name.Length <= max ? name : name[..(max - 1)] + "…";
 
     /// <summary>
-    /// Marshals action to the UI thread. Safe to call from background tasks.
+    /// Marshals action to the UI thread using the captured SynchronizationContext.
+    /// Safe to call from any background thread or timer callback.
     /// </summary>
-    private static void SafeInvoke(Action action)
-    {
-        if (Application.OpenForms.Count > 0)
-        {
-            var form = Application.OpenForms[0];
-            if (form is not null && form.InvokeRequired) { form.BeginInvoke(action); return; }
-        }
-        // No form open — run on current thread (still on UI thread at startup)
-        action();
-    }
+    private void SafeInvoke(Action action)
+        => _syncContext.Post(_ => action(), null);
 
     // ── IDisposable ───────────────────────────────────────────────────────────
 
