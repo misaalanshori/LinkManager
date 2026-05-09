@@ -294,6 +294,8 @@ public sealed class LinkEngine : IDisposable
             config.TestEndpoints,
             config.HttpTestEndpoints,
             config.ProbeTimeoutMs,
+            config.ProbeQuorum,
+            config.EnableIcmpProbe,
             Log);
 
         _healthEvaluator = new HealthEvaluator(config.FailThreshold, config.RestoreThreshold);

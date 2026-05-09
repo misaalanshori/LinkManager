@@ -21,14 +21,26 @@ public sealed class AppConfig
     };
 
     /// <summary>
-    /// HTTP HEAD targets used as fallback if ALL ICMP pings fail.
-    /// Handles environments where ICMP is blocked by firewall.
+    /// HTTP GET targets used as fallback if ALL ICMP pings fail (or ICMP is disabled).
+    /// Each URL has an exact content validator in ConnectivityProbe — any HTTP response that
+    /// doesn't match the expected body/status is treated as a captive portal and rejected.
+    /// At least ProbeQuorum of these must pass for an adapter to be considered healthy.
     /// </summary>
     public List<string> HttpTestEndpoints { get; set; } = new()
     {
+        // Microsoft NCSI (modern + legacy)
         "http://www.msftconnecttest.com/connecttest.txt",
+        "https://www.msftncsi.com/ncsi.txt",
+        // Google (desktop + Android + static CDN — three independent PoPs)
         "https://www.google.com/generate_204",
-        "https://cp.cloudflare.com"
+        "http://connectivitycheck.gstatic.com/generate_204",
+        "http://www.gstatic.com/generate_204",
+        // Cloudflare
+        "https://cp.cloudflare.com",
+        // Mozilla Firefox NCSI
+        "http://detectportal.firefox.com/success.txt",
+        // GNOME NetworkManager
+        "http://nmcheck.gnome.org/check_network_status.txt",
     };
 
     /// <summary>How often to run the probe cycle.</summary>
@@ -55,6 +67,22 @@ public sealed class AppConfig
 
     /// <summary>Timeout in ms for each individual ICMP or HTTP probe attempt.</summary>
     public int ProbeTimeoutMs { get; set; } = 2000;
+
+    /// <summary>
+    /// Minimum number of HTTP endpoints that must pass content validation
+    /// for an adapter to be considered healthy.
+    /// Auto-clamped to [1, HttpTestEndpoints.Count] at runtime.
+    /// Default 2: requires a majority of the default 3 endpoints to agree.
+    /// </summary>
+    public int ProbeQuorum { get; set; } = 2;
+
+    /// <summary>
+    /// When true, ICMP ping is run before HTTP probes as a fast-failure path.
+    /// ICMP results can only accelerate failure detection — they cannot declare
+    /// an adapter healthy on their own, preventing ISP DNS-proxy false positives.
+    /// Set false to skip ICMP entirely (fewer ping.exe processes, slightly slower failure detection).
+    /// </summary>
+    public bool EnableIcmpProbe { get; set; } = true;
 
     /// <summary>Hooks to run after every group switch event.</summary>
     public List<HookConfig> Hooks { get; set; } = new();
